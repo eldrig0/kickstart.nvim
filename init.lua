@@ -334,6 +334,10 @@ require('lazy').setup({
         require('telescope').extensions.flutter.commands()
       end, { desc = 'Flutter tools' })
 
+      vim.keymap.set('n', '<leader>fv', function()
+        require('telescope').extensions.flutter.fvm()
+      end, { desc = 'FVM' })
+
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.initinitinitinit
