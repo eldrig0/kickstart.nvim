@@ -12,6 +12,13 @@ return {
     },
     config = function()
       require('flutter-tools').setup {
+        debuger = {
+          enabled = true,
+        },
+        fvm = true,
+        widget_guides = {
+          enabled = true,
+        },
         lsp = {
           on_attach = function(_, bufnr)
             -- Enable format on save
