@@ -12,7 +12,7 @@ return {
     },
     config = function()
       require('flutter-tools').setup {
-        debuger = {
+        debugger = {
           enabled = true,
         },
         fvm = true,
