@@ -13,7 +13,7 @@ return {
     config = function()
       require('flutter-tools').setup {
         debugger = {
-          enabled = true,
+          enabled = false,
         },
         fvm = true,
         widget_guides = {
@@ -43,6 +43,64 @@ return {
           },
         },
       }
+    end,
+  },
+
+  {
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    config = function()
+      local aug = vim.api.nvim_create_augroup('FormatOnSave', {})
+
+      require('typescript-tools').setup {
+        on_attach = function(_, bufnr)
+          vim.api.nvim_clear_autocmds { group = aug, buffer = bufnr }
+
+          vim.api.nvim_create_autocmd('BufWritePre', {
+            group = aug,
+            buffer = bufnr,
+            callback = function(ev)
+              vim.cmd 'TSToolsFixAll sync'
+              vim.lsp.buf.format { async = false }
+            end,
+          })
+
+          vim.keymap.set('n', '<leader>fw', function()
+            vim.cmd 'TSToolsFixAll sync'
+            vim.lsp.buf.format { async = false }
+            vim.cmd 'write'
+          end, { buffer = bufnr, desc = 'TS Fix + Format + Write' })
+        end,
+      }
+    end,
+    settings = {
+      insertSpaceAfterCommaDelimiter = true,
+      insertSpaceAfterConstructor = true,
+      insertSpaceAfterSemicolonInForStatements = true,
+      insertSpaceBeforeAndAfterBinaryOperators = true,
+      insertSpaceAfterKeywordsInControlFlowStatements = true,
+      insertSpaceAfterFunctionKeywordForAnonymousFunctions = true,
+      insertSpaceBeforeFunctionParenthesis = false,
+
+      insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis = false,
+      insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets = false,
+      insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces = true,
+      insertSpaceAfterOpeningAndBeforeClosingEmptyBraces = true,
+      insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces = false,
+      insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces = false,
+      insertSpaceAfterTypeAssertion = false,
+      placeOpenBraceOnNewLineForFunctions = true,
+      placeOpenBraceOnNewLineForControlBlocks = false,
+      semicolons = 'ignore',
+      indentSwitchCase = true,
+    },
+  },
+  {
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    ft = { 'markdown' },
+    build = function()
+      vim.fn['mkdp#util#install']()
     end,
   },
 }
