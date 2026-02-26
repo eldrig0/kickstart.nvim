@@ -304,11 +304,9 @@ require('lazy').setup({
           file_ignore_patterns = {}, -- Leave empty to rely on .gitignore
         },
         pickers = {
-          pickers = {
             find_files = {
               find_command = { 'fd', '--type', 'f', '--color', 'never', '--no-require-git' },
             },
-          },
         },
         extensions = {
           ['ui-select'] = { require('telescope.themes').get_dropdown() },
@@ -334,14 +332,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
-      -- Flutter tools
-      vim.keymap.set('n', '<leader>fl', function()
-        require('telescope').extensions.flutter.commands()
-      end, { desc = 'Flutter tools' })
-
-      vim.keymap.set('n', '<leader>fv', function()
-        require('telescope').extensions.flutter.fvm()
-      end, { desc = 'FVM' })
 
       -- Flutter tools
       vim.keymap.set('n', '<leader>fl', function()
@@ -388,7 +378,7 @@ require('lazy').setup({
 
       -- Override default behavior and theme when searching
       vim.keymap.set('n', '<leader>/', function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.initinitinitinit
+        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
           winblend = 10,
           previewer = false,
@@ -521,26 +511,13 @@ require('lazy').setup({
               },
             },
           },
-          -- rust_analyzer = {},
-          -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-          --
-          -- Some languages (like typescript) have entire language plugins that can be useful:
-          --    https://github.com/pmizio/typescript-tools.nvim
-          --
-          -- But for many setups, the LSP (`ts_ls`) will work just fine
-          -- ts_ls = {},
-          elixirls = {},
-          lua_ls = {
-            -- cmd = { ... },
-            -- filetypes = { ... },
-            -- capabilities = {},
-            settings = {
-              Lua = {
-                completion = {
-                  callSnippet = 'Replace',
-                },
-                -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                -- diagnostics = { disable = { 'missing-fields' } },
+        },
+        elixirls = {},
+        lua_ls = {
+          settings = {
+            Lua = {
+              completion = {
+                callSnippet = 'Replace',
               },
             },
           },
@@ -554,12 +531,13 @@ require('lazy').setup({
       --    :Mason
       --
       -- You can press `g?` for help in this menu.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'lua_ls', -- Lua Language server
-        'stylua', -- Used to format Lua code
-        -- You can add other tools here that you want Mason to install
-      })
+      local ensure_installed = {
+        'clangd',
+        'pyright',
+        'elixir-ls',
+        'lua-language-server',
+        'stylua',
+      }
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -801,14 +779,17 @@ require('lazy').setup({
 
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    config = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
-      require('nvim-treesitter').install(filetypes)
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = filetypes,
-        callback = function() vim.treesitter.start() end,
-      })
-    end,
+    build = ':TSUpdate',
+    main = 'nvim-treesitter.configs',
+    opts = {
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      auto_install = true,
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = { 'ruby' },
+      },
+      indent = { enable = true, disable = { 'ruby' } },
+    },
   },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the

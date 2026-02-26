@@ -11,9 +11,11 @@ return {
       'stevearc/dressing.nvim', -- optional for vim.ui.select
     },
     config = function()
+      local flutter_fmt_aug = vim.api.nvim_create_augroup('FlutterFormatOnSave', {})
+
       require('flutter-tools').setup {
         debugger = {
-          enabled = false,
+          enabled = true,
         },
         fvm = true,
         widget_guides = {
@@ -21,8 +23,10 @@ return {
         },
         lsp = {
           on_attach = function(_, bufnr)
-            -- Enable format on save
+            vim.api.nvim_clear_autocmds { group = flutter_fmt_aug, buffer = bufnr }
+
             vim.api.nvim_create_autocmd('BufWritePre', {
+              group = flutter_fmt_aug,
               buffer = bufnr,
               callback = function()
                 vim.lsp.buf.format {
@@ -32,7 +36,6 @@ return {
               end,
             })
 
-            -- Add format and save keybinding
             vim.keymap.set('n', '<leader>fw', function()
               vim.lsp.buf.format { async = false }
               vim.cmd 'write'
@@ -59,7 +62,7 @@ return {
           vim.api.nvim_create_autocmd('BufWritePre', {
             group = aug,
             buffer = bufnr,
-            callback = function(ev)
+            callback = function(_)
               vim.cmd 'TSToolsFixAll sync'
               vim.lsp.buf.format { async = false }
             end,
@@ -71,29 +74,28 @@ return {
             vim.cmd 'write'
           end, { buffer = bufnr, desc = 'TS Fix + Format + Write' })
         end,
+        settings = {
+          insertSpaceAfterCommaDelimiter = true,
+          insertSpaceAfterConstructor = true,
+          insertSpaceAfterSemicolonInForStatements = true,
+          insertSpaceBeforeAndAfterBinaryOperators = true,
+          insertSpaceAfterKeywordsInControlFlowStatements = true,
+          insertSpaceAfterFunctionKeywordForAnonymousFunctions = true,
+          insertSpaceBeforeFunctionParenthesis = false,
+          insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis = false,
+          insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets = false,
+          insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces = true,
+          insertSpaceAfterOpeningAndBeforeClosingEmptyBraces = true,
+          insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces = false,
+          insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces = false,
+          insertSpaceAfterTypeAssertion = false,
+          placeOpenBraceOnNewLineForFunctions = true,
+          placeOpenBraceOnNewLineForControlBlocks = false,
+          semicolons = 'ignore',
+          indentSwitchCase = true,
+        },
       }
     end,
-    settings = {
-      insertSpaceAfterCommaDelimiter = true,
-      insertSpaceAfterConstructor = true,
-      insertSpaceAfterSemicolonInForStatements = true,
-      insertSpaceBeforeAndAfterBinaryOperators = true,
-      insertSpaceAfterKeywordsInControlFlowStatements = true,
-      insertSpaceAfterFunctionKeywordForAnonymousFunctions = true,
-      insertSpaceBeforeFunctionParenthesis = false,
-
-      insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis = false,
-      insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets = false,
-      insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces = true,
-      insertSpaceAfterOpeningAndBeforeClosingEmptyBraces = true,
-      insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces = false,
-      insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces = false,
-      insertSpaceAfterTypeAssertion = false,
-      placeOpenBraceOnNewLineForFunctions = true,
-      placeOpenBraceOnNewLineForControlBlocks = false,
-      semicolons = 'ignore',
-      indentSwitchCase = true,
-    },
   },
   {
     'iamcco/markdown-preview.nvim',
